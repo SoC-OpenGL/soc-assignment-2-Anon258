@@ -18,6 +18,7 @@ void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int screenwidth, int screenheight);
 void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 GLuint loadCubemap(std::vector<std::string> faces);
 
 //Window dimensions
@@ -118,6 +119,7 @@ int main(){
     glfwSetKeyCallback(window, Key_Callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
     
     Shader shader("Shaders/vshad.glsl","Shaders/fshad.glsl");
     Texture albedo("TextureMaps/Texture4/albedo.jpg");
@@ -323,18 +325,7 @@ void Key_Callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS){
-        fov -= 20.0f * deltaTime;
-        if(fov<1.0f)
-            fov = 1.0f;
-    }
-    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS){
-        fov +=20.0f *deltaTime;
-        if(fov>89.0f)
-            fov=89.0f;
-    }
-    
+{   
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         camera.KeyboardInput(FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -363,7 +354,16 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
     
-    camera.MouseMovement(xoffset, yoffset);
-    
+    camera.MouseMovement(xoffset, yoffset);  
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (fov >= 1.0f && fov <= 89.0f)
+        fov -= yoffset;
+    if (fov <= 1.0f)
+        fov = 1.0f;
+    if (fov >= 89.0f)
+        fov = 89.0f;
 }
 
